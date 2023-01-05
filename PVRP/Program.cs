@@ -3,7 +3,12 @@ using PVRPSolver;
 
 Console.WriteLine("Hello, World!");
 
-var parser = new Parser("016_sched_161.txt");
+//var parser = new Parser("001_sched_3410_07112021.txt");
+//var parser = new Parser("016_sched_161.txt");
+var parser = new Parser("017_sched_162.txt");
+//var parser = new Parser("018_sched_163.txt");
+//var parser = new Parser("019_sched_164.txt");
+//var parser = new Parser("020_sched_165.txt");
 //var parser = new Parser("021_sched_171.txt");
 //var parser = new Parser("013_sched_3410_03042023.txt");
 await parser.Parse();
@@ -14,7 +19,8 @@ Console.WriteLine("Vehicles count: {0}", parser.Vehicles.Count);
 
 var solver = new Solver(parser.Vehicles, parser.Points, parser.ForecastDepth);
 
-var solution = solver.GetInitialSolution();
+//var solution = solver.GetInitialSolution();
+var solution = solver.GetGreedyInitialSolution();
 
 Console.WriteLine("Before optimization: {0} km, {1} routes, {2} km", solver.Solution.TotalFitnessKm, solver.Solution.Routes.Count(r => !r.IsEmpty), solver.Solution.TotalDistanceKm);
 

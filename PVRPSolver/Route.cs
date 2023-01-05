@@ -195,6 +195,60 @@ namespace PVRPSolver
             }
         }
 
+        public Dictionary<Point, int> ArrivalTimes
+        {
+            get
+            {
+                var points = new Dictionary<Point, int>();
+
+                var time = StartTime;
+
+                for (int i = 0; i < Points.Count - 1; i++)
+                {
+                    time += Points[i].Times[Points[i + 1].ID];
+
+                    if (i == points.Count - 2)
+                    {
+                        points[Points[i + 1]] = time;
+                        break;
+                    }
+
+                    points[Points[i + 1]] = time;
+
+                    if (Points[i + 1].TimeWindows.FirstOrDefault(window => time >= window.Start
+                        && time <= window.End) == null)
+                    {
+                        var minTime = int.MaxValue;
+                        var nearestWindow = Points[i + 1].TimeWindows.FirstOrDefault();
+
+                        foreach (var timeWindow in Points[i + 1].TimeWindows)
+                        {
+                            if (Math.Abs(time - timeWindow.Start) < minTime)
+                            {
+                                minTime = time - timeWindow.Start;
+                                nearestWindow = timeWindow;
+                            }
+
+                            if (Math.Abs(time - timeWindow.End) < minTime)
+                            {
+                                minTime = time - timeWindow.End;
+                                nearestWindow = timeWindow;
+                            }
+                        }
+
+                        if (minTime < 0)
+                        {
+                            time += Math.Abs(minTime);
+                        }
+                    }
+
+                    time += Points[i + 1].ServiceTime;
+                }
+
+                return points;
+            }
+        }
+
         public Route(int day, Point depot, Vehicle vehicle)
         {
             Day = day;
@@ -254,7 +308,7 @@ namespace PVRPSolver
 
         public object Clone()
         {
-            var clone = new Route(Day, Points[0], (Vehicle)Vehicle.Clone());
+            var clone = new Route(Day, Points[0], Vehicle);
 
             clone.Points = new List<Point>();
 

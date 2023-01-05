@@ -9,6 +9,8 @@ namespace PVRPSolver
     public class Solution : ICloneable
     {
         public List<Route> Routes { get; set; }
+        public IList<Point> Points { get; set; }
+        public IList<Vehicle> Vehicles { get; set; }
         public double TotalDistance => Routes.Sum(route => route.Distance);
         public double TotalDistanceKm => Math.Round(TotalDistance / 1000.0, 1);
         public double TotalFitness => Routes.Sum(route => route.Fitness);
@@ -20,9 +22,11 @@ namespace PVRPSolver
             Routes = new List<Route>();
         }
 
-        public Solution(int forecastDepth, IList<Vehicle> vehicles, Point depot)
+        public Solution(int forecastDepth, IList<Vehicle> vehicles, Point depot, IList<Point> points)
         {
             Routes = new List<Route>();
+            Vehicles = vehicles;
+            Points = points;
 
             foreach (var vehicle in vehicles)
             {
@@ -69,9 +73,11 @@ namespace PVRPSolver
 
         public object Clone()
         {
-            var solution = new Solution
+            var solution = new Solution()
             {
-                Routes = Routes.Select(route => (Route)route.Clone()).ToList()
+                Routes = Routes.Select(route => (Route)route.Clone()).ToList(),
+                Vehicles = Vehicles,
+                Points = Points
             };
             return solution;
         }

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +17,10 @@ namespace PVRPSolver
         private IList<Point> points;
         private int forecastDepth;
 
+        private int iteration = 0;
+        private List<int> iterations = new List<int>();
+        private List<double> fitnesses = new List<double>();
+
         public Solution Solution { get; private set; }
 
         public Solver(IList<Vehicle> vehicles, IList<Point> points, int forecastDepth)
@@ -26,15 +32,29 @@ namespace PVRPSolver
 
         public void RunOptimization()
         {
-            Console.WriteLine(Solution.TotalFitnessKm);
-            OptimizeDayRoutes();
-            Console.WriteLine(Solution.TotalFitnessKm);
+            //iterations.Add(iteration++);
+            //fitnesses.Add(Solution.TotalFitnessKm);
+
+            Console.WriteLine($"Count: {Solution.Routes.Count(r => !r.IsEmpty)}, Distance: {Solution.TotalDistanceKm}, Fitness: {Solution.TotalFitnessKm}");
             ShiftPatterns();
-            Console.WriteLine(Solution.TotalFitnessKm);
-            OptimizeDayRoutes();
-            Console.WriteLine(Solution.TotalFitnessKm);
+
+
+            //Console.WriteLine(Solution.TotalFitnessKm);
+            //OptimizeDayRoutes();
+
+            Console.WriteLine($"Count: {Solution.Routes.Count(r => !r.IsEmpty)}, Distance: {Solution.TotalDistanceKm}, Fitness: {Solution.TotalFitnessKm}");
             SwapPatterns();
-            Console.WriteLine(Solution.TotalFitnessKm);
+
+            Console.WriteLine($"Count: {Solution.Routes.Count(r => !r.IsEmpty)}, Distance: {Solution.TotalDistanceKm}, Fitness: {Solution.TotalFitnessKm}");
+            OptimizeDayRoutes();
+
+            //Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-GB");
+            //Console.WriteLine("----------");
+            //Console.WriteLine(string.Join(", ", iterations));
+            //Console.WriteLine(string.Join(", ", fitnesses));
+            //Console.WriteLine("----------");
+
+            Console.WriteLine($"Count: {Solution.Routes.Count(r => !r.IsEmpty)}, Distance: {Solution.TotalDistanceKm}, Fitness: {Solution.TotalFitnessKm}");
         }
 
         private void SwapPatterns()
@@ -132,8 +152,14 @@ namespace PVRPSolver
                             Solution = solution;
                             shouldRestart = true;
 
+                            iterations.Add(iteration++);
+                            fitnesses.Add(Solution.TotalFitnessKm);
+
                             break;
                         }
+
+                        iterations.Add(iteration++);
+                        fitnesses.Add(Solution.TotalFitnessKm);
                     }
 
                     if (shouldRestart)
@@ -230,6 +256,9 @@ namespace PVRPSolver
                         Solution.Routes = Solution.Routes.Where(r => !bestPatternRoutes.Any(pr => pr.Day == r.Day && pr.Vehicle.ID == r.Vehicle.ID)).ToList();
                         Solution.Routes.AddRange(bestPatternRoutes);
 
+                        iterations.Add(iteration++);
+                        fitnesses.Add(Solution.TotalFitnessKm);
+
                         //Console.WriteLine("Routes count: {0}, {1}", Solution.Routes.Where(r => !r.IsEmpty).Count(), Solution.TotalFitnessKm);
 
                         if (shouldRestart)
@@ -256,17 +285,25 @@ namespace PVRPSolver
 
                 if (dayRoutes.Count > 1)
                 {
-                    ProcessShift1_0(dayRoutes);
-
-                    Process2opt(dayRoutes);
-
-                    ProcessSwap1_1(dayRoutes);
-
-                    Process2opt(dayRoutes);
+                    //Console.WriteLine($"{dayRoutes.Count(r => !r.IsEmpty)} {dayRoutes.Sum(r => r.DistanceKm)} {dayRoutes.Sum(r => r.FitnessKm)}");
 
                     ProcessShift0_1(dayRoutes);
 
+
+                    //Console.WriteLine($"{dayRoutes.Count(r => !r.IsEmpty)} {dayRoutes.Sum(r => r.DistanceKm)} {dayRoutes.Sum(r => r.FitnessKm)}");
+
+                    ProcessSwap1_1(dayRoutes);
+
+                    //iterations.Add(iteration++);
+                    //fitnesses.Add(Solution.TotalFitnessKm);
+
+                    Console.WriteLine($"{dayRoutes.Count(r => !r.IsEmpty)} {dayRoutes.Sum(r => r.DistanceKm)} {dayRoutes.Sum(r => r.FitnessKm)}");
+
                     Process2opt(dayRoutes);
+
+                    Console.WriteLine($"{dayRoutes.Count(r => !r.IsEmpty)} {dayRoutes.Sum(r => r.DistanceKm)} {dayRoutes.Sum(r => r.FitnessKm)}");
+
+                    Console.WriteLine();
                 }
                 else
                 {
@@ -338,8 +375,15 @@ namespace PVRPSolver
                         second.InsertPoint(minIndex, first.Points[i]);
                         first.RemovePoint(i);
                         shouldRestart = true;
+
+                        //iterations.Add(iteration++);
+                        //fitnesses.Add(Solution.TotalFitnessKm);
+
                         break;
                     }
+
+                    //iterations.Add(iteration++);
+                    //fitnesses.Add(Solution.TotalFitnessKm);
                 }
             }
         }
@@ -393,9 +437,15 @@ namespace PVRPSolver
                             first.InsertPoint(i, secondPoint);
                             second.InsertPoint(j, firstPoint);
 
+                            iterations.Add(iteration++);
+                            fitnesses.Add(Solution.TotalFitnessKm);
+
                             shouldRestart = true;
                             break;
                         }
+
+                        iterations.Add(iteration++);
+                        fitnesses.Add(Solution.TotalFitnessKm);
                     }
 
                     if (shouldRestart) break;
@@ -442,8 +492,15 @@ namespace PVRPSolver
                         {
                             route.Points.Reverse(i, k - i + 1);
                             shouldRestart = true;
+
+                            iterations.Add(iteration++);
+                            fitnesses.Add(Solution.TotalFitnessKm);
+
                             break;
                         }
+
+                        iterations.Add(iteration++);
+                        fitnesses.Add(Solution.TotalFitnessKm);
                     }
 
                     if (shouldRestart) break;
@@ -451,11 +508,76 @@ namespace PVRPSolver
             }
         }
 
+        public Solution GetGreedyInitialSolution()
+        {
+            var depot = points.First(point => point.IsDepot);
+
+            Solution = new Solution(forecastDepth, vehicles, depot, points);
+
+            var customers = points.Where(point => !point.IsDepot).ToList();
+
+            foreach (var customer in customers)
+            {
+                var minCost = 1e10;
+                var bestRoutes = new List<Route>();
+                var bestPatternId = -1;
+
+                foreach (var vehicle in vehicles)
+                {
+                    foreach (var pattern in customer.Patterns.Keys)
+                    {
+                        var patternRoutes = new List<Route>();
+
+                        foreach (var day in customer.Patterns[pattern])
+                        {
+                            var route = Solution.Routes.First(r => r.Vehicle == vehicle && r.Day == day);
+
+                            var bestPosition = 1;
+                            var bestCost = 1e10;
+                            var newRoute = route;
+
+                            for (int i = 1; i < route.Points.Count; i++)
+                            {
+                                var clone = (Route)route.Clone();
+                                clone.InsertPoint(i, customer);
+
+                                if (clone.Fitness < bestCost)
+                                {
+                                    bestCost = clone.Fitness;
+                                    bestPosition = i;
+                                    newRoute = clone;
+                                }
+                            }
+
+                            patternRoutes.Add(newRoute);
+                        }
+
+                        var cost = patternRoutes.Sum(r => r.Fitness);
+
+                        if (cost < minCost)
+                        {
+                            minCost = cost;
+                            bestRoutes = patternRoutes;
+                            bestPatternId = pattern;
+                        }
+                    }
+                }
+
+                Solution.Routes = Solution.Routes.Where(r => !bestRoutes.Any(pr => pr.Day == r.Day && pr.Vehicle.ID == r.Vehicle.ID)).ToList();
+                Solution.Routes.AddRange(bestRoutes);
+                customer.CurrentPattern = bestPatternId;
+            }
+
+            Solution.Routes = Solution.Routes.OrderBy(r => r.Day).ToList();
+
+            return Solution;
+        }
+
         public Solution GetInitialSolution()
         {
             var depot = points.First(point => point.IsDepot);
 
-            Solution = new Solution(forecastDepth, vehicles, depot);
+            Solution = new Solution(forecastDepth, vehicles, depot, points);
 
             var currentPoint = depot;
             var processedPointsCount = 1;
@@ -474,9 +596,6 @@ namespace PVRPSolver
                         route.AddPoint(currentPoint);
 
                         //if (route.EndTime - route.StartTime > 28800)
-                        //{
-
-                        //}
                     }
 
                     currentPoint.IsVisited = true;

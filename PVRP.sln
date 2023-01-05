@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PVRP", "PVRP\PVRP.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PVRPSolver", "PVRPSolver\PVRPSolver.csproj", "{5E2E5D2F-E0CD-47EF-ACC0-59D186FD4A03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebInterface", "WebInterface\WebInterface.csproj", "{B447520D-9314-4584-BC73-48D36BCD4FAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5E2E5D2F-E0CD-47EF-ACC0-59D186FD4A03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E2E5D2F-E0CD-47EF-ACC0-59D186FD4A03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E2E5D2F-E0CD-47EF-ACC0-59D186FD4A03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B447520D-9314-4584-BC73-48D36BCD4FAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B447520D-9314-4584-BC73-48D36BCD4FAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B447520D-9314-4584-BC73-48D36BCD4FAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B447520D-9314-4584-BC73-48D36BCD4FAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
